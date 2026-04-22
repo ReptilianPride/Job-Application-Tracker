@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>Job Application Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 14px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .refresh-btn {
+      padding: 6px 12px;
+      background: #0ea5e9;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .refresh-btn:hover {
+      background: #0284c7;
+    }
+
+    .tabs {
+      display: flex;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 0 16px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #94a3b8;
+      border-bottom: 2px solid transparent;
+      transition: all 150ms ease;
+    }
+
+    .tab:hover {
+      color: #e2e8f0;
+    }
+
+    .tab.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-container {
+      max-width: none;
+      width: 100%;
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .form-columns {
+      display: flex;
+      gap: 24px;
+    }
+
+    .form-column {
+      flex: 1;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #e2e8f0;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #0f172a;
+      color: #e2e8f0;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-input:read-only {
+      background: #334155;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-textarea.notes {
+      min-height: 60px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 150ms ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #0284c7;
+    }
+
+    .btn-primary:active {
+      background: #0369a1;
+    }
+
+    .btn-primary:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .list-container {
+      background: #1e293b;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      height: calc(100vh - 180px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .search-container {
+      padding: 16px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
+    .table-container {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #334155;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #e2e8f0;
+      border-bottom: 1px solid #475569;
+      position: sticky;
+      top: 0;
+    }
+
+    .table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .table tr:hover {
+      background: #334155;
+    }
+
+    .table tr.job-row:hover {
+      background: #334155;
+    }
+
+    .table td.editable {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .table td.editable:hover {
+      background: #1e3a5f;
+    }
+
+    .table td.date-cell {
+      cursor: default;
+    }
+
+    .cell-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #38bdf8;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-edit {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #059669;
+    }
+
+    .btn-view {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .btn-view:hover {
+      background: #7c3aed;
+    }
+
+    .btn-delete {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #dc2626;
+    }
+
+    .empty-state {
+      padding: 48px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .error-text {
+      color: #f87171;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .form-group.error .form-input,
+    .form-group.error .form-textarea {
+      border-color: #ef4444;
+    }
+
+    .overview-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #0f172a;
+      border-radius: 6px;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    .stat-value.waiting {
+      color: #fef08a;
+    }
+
+    .stat-value.rejection {
+      color: #fca5a5;
+    }
+
+    .overview-table-container {
+      max-height: 400px;
+      overflow: auto;
+      border-radius: 6px;
+    }
+
+    .overview-table {
+      width: 100%;
+    }
+
+    .overview-table th {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .overview-table td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    .modal-header {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #38bdf8;
+    }
+
+    .modal-body {
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .modal-close {
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: #0ea5e9;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">Job Application Tracker</div>
+    <button class="refresh-btn" onclick="refreshData()">Refresh</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="insert">Insert Job</div>
+    <div class="tab" data-tab="list">Job List</div>
+  </div>
+
+  <div id="tab-insert" class="tab-content active">
+    <div class="form-container">
+      <form id="job-form">
+        <div class="form-columns">
+          <div class="form-column">
+            <div class="form-group">
+              <label class="form-label" for="companyName">Company Name *</label>
+              <input type="text" class="form-input" id="companyName" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="jobTitle">Job Title *</label>
+              <input type="text" class="form-input" id="jobTitle" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="dateApplied">Date Applied</label>
+              <input type="text" class="form-input" id="dateApplied" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="jobDescription">Job Description</label>
+              <textarea class="form-textarea" id="jobDescription" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="notes">Notes</label>
+              <textarea class="form-textarea notes" id="notes" rows="2"></textarea>
+            </div>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary">Save Job</button>
+              <button type="button" class="btn btn-secondary" id="clear-btn">Clear</button>
+            </div>
+          </div>
+
+          <div class="form-column">
+            <div class="overview-stats">
+              <div class="stat-item">
+                <span class="stat-label">Total Applications</span>
+                <span class="stat-value" id="total-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Rejections</span>
+                <span class="stat-value rejection" id="rejection-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Waiting for Reply</span>
+                <span class="stat-value waiting" id="waiting-count">0</span>
+              </div>
+            </div>
+            <div class="overview-table-container">
+              <table class="table overview-table">
+                <thead>
+                  <tr>
+                    <th>Company Name</th>
+                    <th>Job Title</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-tbody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="tab-list" class="tab-content">
+    <div class="list-container">
+      <div class="search-container">
+        <input type="text" class="search-input" id="search-input" placeholder="Search by company name...">
+      </div>
+      <div class="table-container">
+        <table class="table" id="jobs-table">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Job Title</th>
+              <th>Date Applied</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-tbody">
+          </tbody>
+        </table>
+        <div class="empty-state" id="empty-state">
+          No jobs found. Add your first job in the Insert tab.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header" id="modal-header">Job Description</div>
+      <div class="modal-body" id="modal-body"></div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let jobs = [];
+    let editingCell = null;
+
+    function generateId() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function formatDate(date) {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
+    }
+
+    function setCurrentDate() {
+      document.getElementById('dateApplied').value = formatDate(new Date());
+    }
+
+    async function loadJobsData() {
+      const data = await window.api.loadJobs();
+      jobs = data.jobs || [];
+      renderJobs();
+      updateOverview();
+    }
+
+    function updateOverview() {
+      const totalCount = jobs.length;
+      const rejectionCount = jobs.filter(job => job.notes === 'R').length;
+      const waitingCount = totalCount - rejectionCount;
+
+      document.getElementById('total-count').textContent = totalCount;
+      document.getElementById('rejection-count').textContent = rejectionCount;
+      document.getElementById('waiting-count').textContent = waitingCount;
+
+      const overviewTbody = document.getElementById('overview-tbody');
+      overviewTbody.innerHTML = jobs.map(job => `
+        <tr>
+          <td>${escapeHtml(job.companyName)}</td>
+          <td>${escapeHtml(job.jobTitle)}</td>
+          <td>${escapeHtml(job.dateApplied)}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function saveJobsData() {
+      await window.api.saveJobs({ jobs });
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'insert') {
+        refreshData();
+      }
+    }
+
+    async function refreshData() {
+      const data = await window.api.loadJobs();
+      jobs = data.jobs || [];
+      renderJobs();
+      updateOverview();
+    }
+
+    function truncateText(text, maxLength) {
+      if (!text) return '';
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '...';
+    }
+
+    function renderJobs(filter = '') {
+      const tbody = document.getElementById('jobs-tbody');
+      const emptyState = document.getElementById('empty-state');
+      const filteredJobs = jobs.filter(job =>
+        job.companyName.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      if (filteredJobs.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        if (filter) {
+          emptyState.textContent = 'No matching jobs found.';
+        }
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      tbody.innerHTML = filteredJobs.map(job => `
+        <tr data-id="${job.id}" class="job-row">
+          <td class="editable" data-field="companyName">${escapeHtml(job.companyName)}</td>
+          <td class="editable" data-field="jobTitle">${escapeHtml(job.jobTitle)}</td>
+          <td class="date-cell">${escapeHtml(job.dateApplied)}</td>
+          <td class="editable" data-field="notes">${escapeHtml(truncateText(job.notes, 50))}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-icon btn-view" onclick="viewJD('${job.id}')">View JD</button>
+              <button class="btn-icon btn-delete" onclick="deleteJob('${job.id}')">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll('.table td.editable').forEach(cell => {
+        cell.addEventListener('dblclick', handleCellDoubleClick);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    function handleCellDoubleClick(e) {
+      if (editingCell) {
+        finishEditing(true);
+      }
+
+      const cell = e.target;
+      const row = cell.closest('tr');
+      const jobId = row.dataset.id;
+      const field = cell.dataset.field;
+      const job = jobs.find(j => j.id === jobId);
+
+      if (!job || !field) return;
+
+      const originalValue = job[field];
+      cell.innerHTML = `<input type="text" class="cell-input" value="${escapeHtml(originalValue)}" data-field="${field}" data-job-id="${jobId}">`;
+      const input = cell.querySelector('input');
+      input.focus();
+      input.select();
+
+      editingCell = { cell, jobId, field };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          finishEditing(false);
+        } else if (e.key === 'Escape') {
+          finishEditing(true);
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        finishEditing(false);
+      });
+    }
+
+    async function finishEditing(cancel) {
+      if (!editingCell) return;
+
+      const { cell, jobId, field } = editingCell;
+      const input = cell.querySelector('input');
+
+      if (!cancel && input) {
+        const newValue = input.value.trim();
+        const job = jobs.find(j => j.id === jobId);
+        if (job) {
+          job[field] = newValue;
+          await saveJobsData();
+        }
+      }
+
+      editingCell = null;
+      renderJobs(document.getElementById('search-input').value);
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const companyName = document.getElementById('companyName').value.trim();
+      const jobTitle = document.getElementById('jobTitle').value.trim();
+
+      if (!companyName || !jobTitle) {
+        if (!companyName) {
+          document.getElementById('companyName').parentElement.classList.add('error');
+        }
+        if (!jobTitle) {
+          document.getElementById('jobTitle').parentElement.classList.add('error');
+        }
+        return;
+      }
+
+      const job = {
+        id: generateId(),
+        companyName,
+        jobTitle,
+        jobDescription: document.getElementById('jobDescription').value.trim(),
+        notes: document.getElementById('notes').value.trim(),
+        dateApplied: document.getElementById('dateApplied').value
+      };
+
+      jobs.push(job);
+      await saveJobsData();
+
+      document.getElementById('job-form').reset();
+      setCurrentDate();
+      updateOverview();
+      // switchTab('list');
+      renderJobs();
+    }
+
+    function clearForm() {
+      document.getElementById('job-form').reset();
+      setCurrentDate();
+    }
+
+    async function editJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      document.getElementById('companyName').value = job.companyName;
+      document.getElementById('jobTitle').value = job.jobTitle;
+      document.getElementById('jobDescription').value = job.jobDescription || '';
+      document.getElementById('notes').value = job.notes || '';
+      document.getElementById('dateApplied').value = job.dateApplied;
+
+      jobs = jobs.filter(j => j.id !== jobId);
+      await saveJobsData();
+
+      switchTab('insert');
+      updateOverview();
+    }
+
+    async function deleteJob(jobId) {
+      if (!confirm('Are you sure you want to delete this job?')) return;
+
+      jobs = jobs.filter(j => j.id !== jobId);
+      await saveJobsData();
+      renderJobs(document.getElementById('search-input').value);
+      updateOverview();
+    }
+
+    function viewJD(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      document.getElementById('modal-header').textContent = `${job.companyName} - ${job.jobTitle}`;
+      document.getElementById('modal-body').textContent = job.jobDescription || 'No job description available.';
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('show');
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        switchTab(tab.dataset.tab);
+      });
+    });
+
+    document.getElementById('job-form').addEventListener('submit', handleFormSubmit);
+    document.getElementById('clear-btn').addEventListener('click', clearForm);
+
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      renderJobs(e.target.value);
+    });
+
+    document.getElementById('companyName').addEventListener('input', function() {
+      this.parentElement.classList.remove('error');
+    });
+
+    document.getElementById('jobTitle').addEventListener('input', function() {
+      this.parentElement.classList.remove('error');
+    });
+
+    setCurrentDate();
+    loadJobsData();
+  </script>
+</body>
+</html>
