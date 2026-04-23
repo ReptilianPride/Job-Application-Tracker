@@ -2,9 +2,10 @@
 
 A desktop application to track and manage your job applications. Built with Electron, it provides an intuitive interface to log, search, and monitor the status of all your job applications in one place.
 
-<!-- Add screenshots here: -->
-![Main Interface](docs/images/main-interface.png)
-![Job List View](docs/images/job-list-view.png)
+<!-- ![Main Interface](docs/images/main-interface.png) -->
+<!-- ![Job List View](docs/images/job-list-view.png) -->
+<img src="docs/images/main-interface.png" alt="Main Interface" width="700">
+<img src="docs/images/job-list-view.png" alt="Job List View" width="700">
 
 ## Features
 
