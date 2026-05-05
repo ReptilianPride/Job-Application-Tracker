@@ -59,6 +59,16 @@ npm run dev
    - **Notes** (optional) - Add any notes, follow-up dates, or use "R" to mark rejections
 4. Click **Save Job** to add it to your list
 
+### Marking a Job as Rejected
+
+To mark a job application as rejected:
+
+1. Navigate to the **Job List** tab
+2. Find the job application you want to mark
+3. **Double-click** the **Notes** cell for that job
+4. Type the letter **`R`** into the notes field (in caps)
+5. The application will automatically be marked as rejected and reflected in your dashboard statistics
+
 ### Managing Jobs
 
 - **Search**: Use the search bar on the Job List tab to filter by company name
