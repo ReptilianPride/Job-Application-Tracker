@@ -617,6 +617,11 @@
           <td>${escapeHtml(job.dateApplied)}</td>
         </tr>
       `).join('');
+
+      const overviewContainer = document.querySelector('.overview-table-container');
+      requestAnimationFrame(() => {
+        overviewContainer.scrollTop = overviewContainer.scrollHeight;
+      });
     }
 
     async function saveJobsData() {
@@ -632,6 +637,12 @@
 
       if (tabName === 'insert') {
         refreshData();
+      } else if (tabName === 'list') {
+        refreshData();
+        const tableContainer = document.querySelector('.table-container');
+        requestAnimationFrame(() => {
+          tableContainer.scrollTop = tableContainer.scrollHeight;
+        });
       }
     }
 
@@ -682,6 +693,11 @@
 
       document.querySelectorAll('.table td.editable').forEach(cell => {
         cell.addEventListener('dblclick', handleCellDoubleClick);
+      });
+
+      const tableContainer = document.querySelector('.table-container');
+      requestAnimationFrame(() => {
+        tableContainer.scrollTop = tableContainer.scrollHeight;
       });
     }
 
