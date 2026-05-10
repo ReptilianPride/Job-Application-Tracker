@@ -610,7 +610,7 @@
       document.getElementById('waiting-count').textContent = waitingCount;
 
       const overviewTbody = document.getElementById('overview-tbody');
-      overviewTbody.innerHTML = jobs.map(job => `
+      overviewTbody.innerHTML = jobs.filter(job => job.notes !== 'R').map(job => `
         <tr>
           <td>${escapeHtml(job.companyName)}</td>
           <td>${escapeHtml(job.jobTitle)}</td>
