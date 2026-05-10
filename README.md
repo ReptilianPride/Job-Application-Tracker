@@ -1,5 +1,13 @@
 # Job Application Tracker
 
+## Table of Contents
+
+- [Installation](#installation)
+- [How to Update](#how-to-update)
+- [Usage](#usage)
+- [Features](#features)
+- [License](#license)
+
 A desktop application to track and manage your job applications. Built with Electron, it provides an intuitive interface to log, search, and monitor the status of all your job applications in one place.
 
 <!-- ![Main Interface](docs/images/main-interface.png) -->
@@ -45,6 +53,20 @@ npm install
 # Run in development mode
 npm run dev
 ```
+
+## How to Update
+
+### Carry Over Job Data Between Versions
+
+To preserve your existing job data when upgrading to a new version of the application:
+
+1. Copy the `jobs.json` file from the root directory of the previous version.
+2. Paste it into the root directory of the new version (replace the existing file if prompted).
+3. Start the application as usual.
+
+> [!WARNING]
+> If the application is already running when you copy the file, click the **Refresh** button to reload the updated data.
+
 
 ## Usage
 
