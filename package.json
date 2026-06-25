@@ -1,6 +1,6 @@
 {
   "name": "job-application-tracker",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "GUI application to log job descriptions for companies",
   "main": "src/main.js",
   "scripts": {
